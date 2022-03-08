@@ -1,0 +1,37 @@
+name: Run E2E tests with detox
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    runs-on: macos-latest
+
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+          cache: yarn
+
+      - name: Download build
+        uses: suisei-cn/actions-download-file@v1
+        id: downloadedApp
+        with:
+          url: ${{ secrets.EXPO_FILE_URL }}
+          target: bin/
+
+      - name: Rename app build
+        run: cd bin && ls
+
+      # - name: Setup detox
+      #   run: |
+      #     brew tap wix/brew \
+      #     brew install applesimutils \
+
+      # - name: 📦 Install dependencies
+      #   run: yarn install
