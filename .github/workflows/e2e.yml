@@ -26,7 +26,12 @@ jobs:
           target: bin/
 
       - name: Untar app build
-        run: cd bin && tar xvfz f8bf65aa-2bad-4983-8952-189e23adf392-98111e942ea945308df3157ae5405909.tar.gz && ls && cd ..
+        run: |
+          cd bin \
+          gunzip f8bf65aa-2bad-4983-8952-189e23adf392-98111e942ea945308df3157ae5405909.tar.gz \
+          tar xvfz f8bf65aa-2bad-4983-8952-189e23adf392-98111e942ea945308df3157ae5405909.tar.gz \
+          ls \
+          cd .. \
 
       - name: Setup detox
         run: |
