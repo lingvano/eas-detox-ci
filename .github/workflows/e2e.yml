@@ -3,6 +3,10 @@ name: Run E2E tests with detox
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      downloadUrl:
+        description: 'Link to expo build url'
+        required: true
 
 jobs:
   run-tests:
@@ -22,17 +26,14 @@ jobs:
         uses: suisei-cn/actions-download-file@v1
         id: downloadedApp
         with:
-          url: ${{ secrets.EXPO_FILE_URL }}
+          url: ${{ github.event.inputs.downloadUrl }}
           target: bin/
 
       - name: Untar app build
         run: |
           cd bin
           ls -a
-          echo 'now filesize'
-          ls -l w8EMcJqZWftmtq6FGfTnhH.tar.gz
-          # gunzip f8bf65aa-2bad-4983-8952-189e23adf392-98111e942ea945308df3157ae5405909.tar.gz
-          tar xvfz w8EMcJqZWftmtq6FGfTnhH.tar.gz
+          for f in *.tar.gz; do tar -xvfz "$f"; done
           ls
           cd ..
 
