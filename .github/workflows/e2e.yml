@@ -33,7 +33,7 @@ jobs:
         run: |
           cd bin
           ls -a
-          for f in *.tar.gz; do tar -xvfz "$f"; done
+          for f in *.tar.gz; do tar -xvf "$f"; done
           ls
           cd ..
 
