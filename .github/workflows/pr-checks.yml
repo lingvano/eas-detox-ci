@@ -19,14 +19,10 @@ jobs:
       - name: Setup Yarn
         run: npm install --g yarn
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
       - uses: actions/cache@v3
         id: yarn-cache
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          path: node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
@@ -62,9 +58,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: |
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
             node_modules
-            packages/*/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Node.js dependencies
