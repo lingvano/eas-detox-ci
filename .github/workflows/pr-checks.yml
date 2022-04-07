@@ -32,8 +32,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install Node.js dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --prefer-offline
 
       - name: Run Tests
         run: yarn jest --coverage
@@ -47,13 +46,13 @@ jobs:
       - name: 🏗 Setup repo
         uses: actions/checkout@v2
 
-      - name: Setup Yarn
-        run: npm install --g yarn
-
-      - name: 🏗 Setup Node
+      - name: 🏗 Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 14
+
+      - name: Setup Yarn
+        run: npm install --g yarn
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
@@ -67,6 +66,9 @@ jobs:
             node_modules
             packages/*/node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install Node.js dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
 
       - name: 🏗 Setup Expo
         uses: expo/expo-github-action@v7
