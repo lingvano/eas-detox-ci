@@ -50,11 +50,7 @@ jobs:
       - name: Setup Yarn
         run: npm install --g yarn
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Cache node_modules
+      - name: Get cached node_modules
         uses: actions/cache@v3
         with:
           path: |
@@ -70,10 +66,10 @@ jobs:
           expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: 🚀 Publish preview
-        run: expo publish --release-channel=pr-${{ github.event.number }} --non-interactive
+      # - name: 🚀 Publish preview
+      #   run: expo publish --release-channel=pr-${{ github.event.number }} --non-interactive
 
-      - name: 💬 Comment preview
-        uses: expo/expo-github-action/preview-comment@v7
-        with:
-          channel: pr-${{ github.event.number }}
+      # - name: 💬 Comment preview
+      #   uses: expo/expo-github-action/preview-comment@v7
+      #   with:
+      #     channel: pr-${{ github.event.number }}
