@@ -1,9 +1,12 @@
-name: Run E2E tests with Detox
+name: Run E2E tests with detox
 
 on:
-  pull_request:
-    branches:
-      - master
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      downloadUrl:
+        description: 'Link to expo build url'
+        required: true
 
 jobs:
   run-tests:
@@ -18,21 +21,21 @@ jobs:
         with:
           node-version: 12.x
           cache: yarn
-          
-      - name: 🏗 Setup Expo and EAS
-        uses: expo/expo-github-action@v7
-        with:
-          expo-version: latest
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build app locally using EAS
+      - name: Download build
+        uses: suisei-cn/actions-download-file@v1
+        id: downloadedApp
+        with:
+          url: ${{ github.event.inputs.downloadUrl }}
+          target: bin/
+
+      - name: Untar app build
         run: |
-          eas build --local \
-            --non-interactive \
-            --output=./bin/easdetoxci.app \
-            --platform=ios \
-            --profile=development-sim
+          cd bin
+          ls -a
+          for f in *.tar.gz; do tar -xvf "$f"; done
+          ls
+          cd ..
 
       - name: Setup detox
         run: |
