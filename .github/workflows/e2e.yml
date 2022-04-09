@@ -18,6 +18,13 @@ jobs:
         with:
           node-version: 12.x
           cache: yarn
+          
+      - name: 🏗 Setup Expo and EAS
+        uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build app locally using EAS
         run: |
