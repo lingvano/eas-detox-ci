@@ -1,0 +1,75 @@
+name: PR Checks
+on:
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  run-unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Setup Yarn
+        run: npm install --g yarn
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install Node.js dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: Run Tests
+        run: yarn jest --coverage
+
+  publish-to-expo-go:
+    needs: run-unit-tests
+    name: Publish preview to Expo Go
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Setup Yarn
+        run: npm install --g yarn
+
+      - name: Get cached node_modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install Node.js dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: 🏗 Setup Expo
+        uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # - name: 🚀 Publish preview
+      #   run: expo publish --release-channel=pr-${{ github.event.number }} --non-interactive
+
+      # - name: 💬 Comment preview
+      #   uses: expo/expo-github-action/preview-comment@v7
+      #   with:
+      #     channel: pr-${{ github.event.number }}
