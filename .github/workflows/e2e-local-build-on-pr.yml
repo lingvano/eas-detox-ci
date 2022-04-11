@@ -1,0 +1,49 @@
+name: Run E2E tests with Detox
+on:
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  run-tests:
+    runs-on: macos-latest
+
+    steps:
+      - name: 🏗 Setup repo
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+          cache: yarn
+
+      - name: 🏗 Setup Expo and EAS
+        uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build app locally using EAS
+        run: |
+          eas build --local \
+            --non-interactive \
+            --output=./bin/easdetoxci.app \
+            --platform=ios \
+            --profile=development-sim
+
+      - name: Setup Detox
+        run: |
+          brew tap wix/brew
+          brew install applesimutils
+
+      - name: 📦 Install dependencies
+        run: yarn install
+
+      - name: Open Simulator & run tests
+        run: |
+          open -a Simulator.app
+          sleep 10
+          xcrun simctl install booted ./bin/easdetoxci.app
+          sleep 15
+          yarn detox test --configuration ios
