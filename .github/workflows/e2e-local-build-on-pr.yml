@@ -30,7 +30,9 @@ jobs:
             --non-interactive \
             --output=./bin/easdetoxci.app \
             --platform=ios \
-            --profile=development-sim
+            --profile=development-sim \
+            --clear-cache \
+            --json
 
       - name: Setup Detox
         run: |
