@@ -1,11 +1,11 @@
-name: Run E2E tests with detox
+name: Run E2E tests with Detox
 
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
       downloadUrl:
-        description: 'Link to expo build url'
+        description: 'Link to Expo build url'
         required: true
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: 🏗 Setup repo
         uses: actions/checkout@v2
 
-      - name: 🏗 Setup Node
+      - name: 🏗 Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 12.x
@@ -36,19 +36,12 @@ jobs:
           for f in *.tar.gz; do tar -xvf "$f"; done
           ls
           cd ..
-
-      - name: Setup detox
+      - name: Setup Detox
         run: |
           brew tap wix/brew
           brew install applesimutils
-
       - name: 📦 Install dependencies
         run: yarn install
 
-      - name: Open simulator & run tests
-        run: |
-          open -a Simulator.app
-          sleep 10
-          xcrun simctl install booted ./bin/easdetoxci.app
-          sleep 15
-          yarn detox test --configuration ios
+      - name: Open Simulator & run tests
+        run: yarn detox test --configuration ios
