@@ -41,9 +41,4 @@ jobs:
         run: yarn install
 
       - name: Open Simulator & run tests
-        run: |
-          open -a Simulator.app
-          sleep 10
-          xcrun simctl install booted ./bin/easdetoxci.app
-          sleep 15
-          yarn detox test --configuration ios
+        run: yarn detox test --configuration ios
