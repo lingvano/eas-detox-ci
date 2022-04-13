@@ -1,6 +1,9 @@
 name: E2E tests
 on:
   workflow_call:
+    secrets:
+      EXPO_TOKEN:
+        required: true
 
 jobs:
   e2e-tests:
