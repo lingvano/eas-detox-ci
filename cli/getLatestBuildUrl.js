@@ -13,9 +13,7 @@ exec(easCommand, (error, stdout, stderr) => {
     process.exit(1);
   }
 
-  const latestBuild = JSON.parse(stdout)[0];
-  const buildUrl = latestBuild.artifacts.buildUrl;
-
+  const buildUrl = stdout.match(/buildUrl": "(.*)"/)[1];
   if (buildUrl) {
     console.log(buildUrl);
     process.exit(0);
