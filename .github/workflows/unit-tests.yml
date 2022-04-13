@@ -1,0 +1,16 @@
+name: Unit tests
+on:
+  workflow_call:
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup repo & install dependencies
+        uses: ./.github/actions/setup-repo
+
+      - name: Run Tests
+        run: yarn jest --coverage
