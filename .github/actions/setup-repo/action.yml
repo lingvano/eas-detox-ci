@@ -1,4 +1,5 @@
 name: Setup repo & install dependencies
+description: This composite action can be used for setting up the app environment
 runs:
   using: "composite"
   steps:

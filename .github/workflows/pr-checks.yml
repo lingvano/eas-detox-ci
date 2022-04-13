@@ -27,8 +27,6 @@ jobs:
 
       - name: 🏗 Setup repo & install dependencies
         uses: ./.github/actions/setup-repo
-        with:
-          runner: macos-latest
 
       - name: 🏗 Setup Expo
         uses: expo/expo-github-action@v7
