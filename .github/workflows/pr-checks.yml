@@ -57,7 +57,7 @@ jobs:
         run: eas build:list --distribution=simulator --status=finished --platform=ios --limit=1 --json
 
       - name: 🏗 Get current build url
-        run: echo "::set-output name=BUILD_URL::$(node cli/getLatestBuildUrl.js)"
+        run: echo "::set-output name=BUILD_URL::$(yarn run getLatestBuildUrl)"
         id: url
 
       - name: Setup Yarn
