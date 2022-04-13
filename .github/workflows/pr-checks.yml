@@ -53,11 +53,11 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Debug output
-        run: eas build:list --distribution=simulator --status=finished --platform=ios --limit=1 --json
+      - name: Write build url to file
+        run: eas build:list --distribution=simulator --status=finished --platform=ios --limit=1 --json > cli/buildOutput.txt
 
       - name: 🏗 Get current build url
-        run: echo "::set-output name=BUILD_URL::$(yarn run getLatestBuildUrl)"
+        run: echo "::set-output name=BUILD_URL::$(node cli/getLatestBuildUrl.js)"
         id: url
 
       - name: Setup Yarn
