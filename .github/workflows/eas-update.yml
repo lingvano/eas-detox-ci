@@ -1,0 +1,27 @@
+name: EAS update
+on:
+  workflow_call:
+
+jobs:
+  eas-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup repo & install dependencies
+        uses: ./.github/actions/setup-repo
+
+      - name: 🏗 Setup EAS CLI
+        uses: expo/expo-github-action@v7
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🚀 Publish preview
+        run: eas update --release-channel=pr-${{ github.event.number }} --non-interactive
+
+      - name: 💬 Comment preview
+        uses: expo/expo-github-action/preview-comment@v7
+        with:
+          channel: pr-${{ github.event.number }}
