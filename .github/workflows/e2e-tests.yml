@@ -1,0 +1,50 @@
+name: E2E tests
+on:
+  workflow_call:
+    secrets:
+      EXPO_TOKEN:
+        required: true
+
+jobs:
+  e2e-tests:
+    runs-on: macos-latest
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v2
+
+      - name: 🏗 Setup repo & install dependencies
+        uses: ./.github/actions/setup-repo
+
+      - name: 🏗 Setup Expo
+        uses: expo/expo-github-action@v7
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🔗 Get current build url
+        run: echo "::set-output name=BUILD_URL::$(node cli/getLatestBuildUrl.js)"
+        id: url
+
+      - name: 🏗 Download build
+        uses: suisei-cn/actions-download-file@v1
+        id: downloadedApp
+        with:
+          url: ${{ steps.url.outputs.BUILD_URL }}
+          target: bin/
+
+      - name: 📤 Untar app build
+        run: |
+          cd bin
+          ls -a
+          for f in *.tar.gz; do tar -xvf "$f"; done
+          ls
+          cd ..
+
+      - name: 🏗 Setup Detox
+        run: |
+          brew tap wix/brew
+          brew install applesimutils
+          yarn detox clean-framework-cache && yarn detox build-framework-cache
+
+      - name: 🧪 Run Detox tests
+        run: yarn detox test --configuration ios
