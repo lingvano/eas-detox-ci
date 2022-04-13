@@ -8,6 +8,9 @@ jobs:
     name: Unit tests
     runs-on: ubuntu-latest
     steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v2
+
       - name: 🏗 Setup repo & install dependencies
         uses: ./.github/workflows/repo-setup
 
@@ -19,6 +22,9 @@ jobs:
     name: E2E tests
     runs-on: macos-latest
     steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v2
+
       - name: 🏗 Setup repo & install dependencies
         uses: ./.github/workflows/repo-setup
         with:
@@ -62,6 +68,9 @@ jobs:
     name: Publish preview to Expo Go
     runs-on: ubuntu-latest
     steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v2
+
       - name: 🏗 Setup repo & install dependencies
         uses: ./.github/workflows/repo-setup
 
