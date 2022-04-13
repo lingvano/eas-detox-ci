@@ -9,6 +9,7 @@ runs:
 
     - name: 🏗 Setup Yarn
       run: npm install --g yarn
+      shell: bash
 
     - name: 📦 Cache dependencies
       uses: actions/cache@v3
@@ -21,3 +22,4 @@ runs:
 
     - name: 📦 Install Node.js dependencies
       run: yarn install --frozen-lockfile --prefer-offline
+      shell: bash
