@@ -6,11 +6,11 @@ on:
 jobs:
   unit-tests:
     name: Unit tests
-    uses: ./.github/workflows/unit-tests.yml
+    uses: lingvano/eas-detox-ci/.github/workflows/unit-tests.yml
 
   e2e-tests:
     needs: unit-tests
-    uses: ./.github/workflows/e2e-tests.yml
+    uses: lingvano/eas-detox-ci/.github/workflows/e2e-tests.yml
     name: E2E tests
     secrets:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -18,6 +18,6 @@ jobs:
   # eas-update:
   #   needs: e2e-tests
   #   name: Publish preview with EAS update
-  #   uses: ./.github/workflows/eas-update.yml
+  #   uses: lingvano/eas-detox-ci/.github/workflows/eas-update.yml
   #   secrets:
   #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
