@@ -1,6 +1,12 @@
 name: E2E tests
 on:
   workflow_call:
+    inputs:
+      DETOX_CONFIGURATION:
+        type: string
+        description: Specify the name of your detox configuration
+        default: ios
+        required: false
     secrets:
       EXPO_TOKEN:
         required: true
@@ -73,4 +79,4 @@ jobs:
           yarn detox clean-framework-cache && yarn detox build-framework-cache
 
       - name: 🧪 Run Detox tests
-        run: yarn detox test --configuration ios
+        run: yarn detox test --configuration ${{ inputs.DETOX_CONFIGURATION }}

@@ -1,6 +1,12 @@
 name: Unit tests
 on:
   workflow_call:
+    inputs:
+      TEST_COMMAND:
+        description: Specify your test command (only yarn is supported)
+        required: false
+        type: string
+        default: yarn jest --coverage
 
 jobs:
   unit-tests:
@@ -9,8 +15,25 @@ jobs:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v2
 
-      - name: 🏗 Setup repo & install dependencies
-        uses: lingvano/eas-detox-ci/.github/actions/setup-repo@master
+      - name: 🏗 Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: 🏗 Setup Yarn
+        run: npm install --g yarn
+
+      - name: 📦 Cache dependencies
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: 📦 Install Node.js dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
 
       - name: Run Tests
-        run: yarn jest --coverage
+        run: ${{ inputs.TEST_COMMAND }}
