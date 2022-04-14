@@ -13,6 +13,7 @@ on:
 
 jobs:
   e2e-tests:
+    name: E2E tests
     runs-on: macos-latest
     steps:
       - name: 🏗 Checkout repository

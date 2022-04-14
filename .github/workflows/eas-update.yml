@@ -7,6 +7,7 @@ on:
 
 jobs:
   eas-update:
+    name: EAS update
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Checkout repository
