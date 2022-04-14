@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: 🏗 Setup repo & install dependencies
-        uses: ./.github/actions/setup-repo
+        uses: lingvano/eas-detox-ci/.github/actions/setup-repo@master
 
       - name: Run Tests
         run: yarn jest --coverage
