@@ -12,8 +12,34 @@ jobs:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v2
 
-      - name: 🏗 Setup repo & install dependencies
-        uses: lingvano/eas-detox-ci/.github/actions/setup-repo@master
+      # This reusable action only works when invoked locally from this repo
+      # It does not work when called from another repository
+      # even if the the path in 'uses' is absolute
+
+      # - name: 🏗 Setup repo & install dependencies
+      #   uses: ./.github/actions/setup-repo
+
+      # Workaround START: Making workflow available to other repos
+      - name: 🏗 Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: 🏗 Setup Yarn
+        run: npm install --g yarn
+
+      - name: 📦 Cache dependencies
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: 📦 Install Node.js dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+      # Workaround END #
 
       - name: 🏗 Setup Expo
         uses: expo/expo-github-action@v7
