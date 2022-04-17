@@ -7,7 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test:e2e": "jest --testMatch=\"**/e2e/appium/**.test.ts\""
+    "test:e2e:appium": "jest --testMatch=\"**/e2e/appium/**.e2e.ts\""
   },
   "dependencies": {
     "expo": "~44.0.0",
