@@ -1,14 +1,14 @@
 import { appiumConfig } from './config';
 const wd = require('wd');
 
-jest.setTimeout(30000);
+jest.setTimeout(100000);
 
 const driver = wd.promiseChainRemote('localhost', 4723);
 
 describe('Example Test', () => {
   beforeAll(async () => {
     await driver.init(appiumConfig);
-    await driver.sleep(2000);
+    await driver.sleep(20000);
   });
 
   afterAll(async () => {
@@ -16,6 +16,12 @@ describe('Example Test', () => {
   });
 
   test('Smoke test', async () => {
-    expect(await driver.hasElementByAccessibilityId('greeting')).toBe(true);
+    if (appiumConfig.platformName === 'android') {
+      expect(await driver.hasElementByAccessibilityId('greeting')).toBe(true);
+    } else if (appiumConfig.platformName === 'ios') {
+      expect(await driver.hasElementByName('Hello world!')).toBe(true);
+    } else {
+      throw new Error('Unsupported platform');
+    }
   });
 });

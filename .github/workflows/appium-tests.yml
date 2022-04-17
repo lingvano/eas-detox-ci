@@ -1,0 +1,104 @@
+name: E2E tests
+on:
+  workflow_call:
+    inputs:
+      PLATFORM:
+        type: string
+        description: Specify the platform ( "ios" | "android" )
+        required: true
+      DEVICE:
+        type: string
+        description: Specify the device to run on (e.g. "iPhone 11")
+        required: true
+    secrets:
+      EXPO_TOKEN:
+        required: true
+
+jobs:
+  e2e-tests:
+    name: Appium
+    runs-on: macos-latest
+    steps:
+      - name: 🏗  Checkout repository
+        uses: actions/checkout@v2
+
+      - name: 📱  Open simulator
+        run: open -a Simulator.app
+
+      - name: 📱  Show available iOS Simulators
+        run: xcrun simctl list
+
+      - name: 🏗  Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: 🏗 Setup Yarn
+        run: npm install --g yarn
+
+      - name: 📦  Cache dependencies
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: 📦  Install Node.js dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: 🏗  Setup Expo
+        uses: expo/expo-github-action@v7
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🔗  Get current build url
+        run: echo "::set-output name=BUILD_URL::$(node cli/getLatestBuildUrl.js)"
+        id: url
+
+      - name: 🏗  Download build
+        uses: suisei-cn/actions-download-file@v1
+        id: downloadedApp
+        with:
+          url: ${{ steps.url.outputs.BUILD_URL }}
+          target: bin/
+
+      - name: 📤  Untar app build
+        run: |
+          cd bin
+          pwd
+          ls -a
+          for f in *.tar.gz; do tar -xvf "$f"; done
+          ls
+          cd ..
+          echo $GITHUB_WORKSPACE/bin/easdetoxci.app
+
+      - name: 🏗  Setup Appium for iOS
+        run: brew install carthage
+
+      - name: 🏗  Start Appium Server
+        run: yarn appium --log-timestamp --log-no-colors > appium.log &
+
+      - name: Wait for Appium Server to Start
+        run: |
+          until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:4723/wd/hub/sessions); do
+            sleep 5
+          done
+
+      - name: 🧪  Spinup Android environment
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: DEVICE="test" PLATFORM=android APP_URL=https://expo.dev/artifacts/eas/aoiAuC2a4R6hes3J1yoD2K.apk yarn test:e2e:appium --forceExit
+
+      - name: 🧪  Run Appium tests
+        run: APP_URL="$GITHUB_WORKSPACE/bin/easdetoxci.app" PLATFORM=${{ inputs.PLATFORM }} DEVICE="${{ inputs.DEVICE }}" yarn test:e2e:appium --forceExit
+
+      - name: Upload Appium logs
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: appium.log
+          path: appium.log

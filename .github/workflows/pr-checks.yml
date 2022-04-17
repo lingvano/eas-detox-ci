@@ -15,6 +15,16 @@ jobs:
     secrets:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
+  appium-tests:
+    # needs: unit-tests
+    name: iOS Appium tests
+    uses: ./.github/workflows/appium-tests.yml
+    with:
+      PLATFORM: ios
+      DEVICE: "iPhone 11"
+    secrets:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
   # eas-update:
   #   needs: e2e-tests
   #   name: Publish preview with EAS update
