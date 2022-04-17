@@ -22,9 +22,6 @@ jobs:
       - name: 🏗  Checkout repository
         uses: actions/checkout@v2
 
-      - name: 📱  Open simulator
-        run: open -a Simulator.app
-
       - name: 📱  Show available iOS Simulators
         run: xcrun simctl list
 
@@ -75,9 +72,6 @@ jobs:
           cd ..
           echo $GITHUB_WORKSPACE/bin/easdetoxci.app
 
-      - name: 🏗  Setup Appium for iOS
-        run: brew install carthage
-
       - name: 🏗  Start Appium Server
         run: yarn appium --log-timestamp --log-no-colors > appium.log &
 
@@ -87,18 +81,20 @@ jobs:
             sleep 5
           done
 
-      - name: 🧪  Spinup Android environment
+      - name: 🧪  Spinup Android environment & run tests
+        if: ${{ inputs.PLATFORM }} == 'android'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           script: DEVICE="test" PLATFORM=android APP_URL=https://expo.dev/artifacts/eas/aoiAuC2a4R6hes3J1yoD2K.apk yarn test:e2e:appium --forceExit
 
-      - name: 🧪  Run Appium tests
-        run: APP_URL="$GITHUB_WORKSPACE/bin/easdetoxci.app" PLATFORM=${{ inputs.PLATFORM }} DEVICE="${{ inputs.DEVICE }}" yarn test:e2e:appium --forceExit
+      - name: 🧪  Run Appium tests on iOS
+        if: ${{ inputs.PLATFORM }} == 'ios'
+        run: APP_URL="$GITHUB_WORKSPACE/bin/easdetoxci.app" PLATFORM=ios DEVICE="${{ inputs.DEVICE }}" yarn test:e2e:appium --forceExit
 
       - name: Upload Appium logs
         if: always()
         uses: actions/upload-artifact@v1
         with:
-          name: appium.log
-          path: appium.log
+          name: appium-${{ inputs.PLATFORM }}.log
+          path: appium-${{ inputs.PLATFORM }}.log
