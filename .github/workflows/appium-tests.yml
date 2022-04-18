@@ -52,10 +52,16 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 🔗  Get current build url
-        run: echo "::set-output name=BUILD_URL::$(node cli/getLatestBuildUrl.js)"
+        run: |
+          eas build:list --buildProfile=development-sim --status=finished --platform=${{ inputs.PLATFORM }} --limit=1 --json > buildOutput.txt
+
+          buildUrl=$(cat buildOutput.txt | sed -En 's/.*"buildUrl": "(.*)".*/\1/p')
+          echo "::set-output name=BUILD_URL::$(echo $buildUrl)"
+          echo $buildUrl
         id: url
 
       - name: 🏗  Download build
+        if: ${{ inputs.PLATFORM == 'ios' }}
         uses: suisei-cn/actions-download-file@v1
         id: downloadedApp
         with:
@@ -63,17 +69,15 @@ jobs:
           target: bin/
 
       - name: 📤  Untar app build
+        if: ${{ inputs.PLATFORM == 'ios' }}
         run: |
           cd bin
-          pwd
           ls -a
           for f in *.tar.gz; do tar -xvf "$f"; done
-          ls
           cd ..
-          echo $GITHUB_WORKSPACE/bin/easdetoxci.app
 
       - name: 🏗  Start Appium Server
-        run: yarn appium --log-timestamp --log-no-colors > appium.log &
+        run: yarn appium --log-timestamp --log-no-colors > appium-${{ inputs.PLATFORM }}.log &
 
       - name: Wait for Appium Server to Start
         run: |
@@ -82,14 +86,14 @@ jobs:
           done
 
       - name: 🧪  Spinup Android environment & run tests
-        if: ${{ inputs.PLATFORM }} == 'android'
+        if: ${{ inputs.PLATFORM == 'android' }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
-          script: DEVICE="test" PLATFORM=android APP_URL=https://expo.dev/artifacts/eas/aoiAuC2a4R6hes3J1yoD2K.apk yarn test:e2e:appium --forceExit
+          script: DEVICE="test" PLATFORM=android APP_URL=${{ steps.url.outputs.BUILD_URL }} yarn test:e2e:appium --forceExit
 
       - name: 🧪  Run Appium tests on iOS
-        if: ${{ inputs.PLATFORM }} == 'ios'
+        if: ${{ inputs.PLATFORM == 'ios' }}
         run: APP_URL="$GITHUB_WORKSPACE/bin/easdetoxci.app" PLATFORM=ios DEVICE="${{ inputs.DEVICE }}" yarn test:e2e:appium --forceExit
 
       - name: Upload Appium logs
