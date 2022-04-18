@@ -25,6 +25,21 @@ jobs:
       - name: 📱  Show available iOS Simulators
         run: xcrun simctl list
 
+      - name: Create and Run iOS Emulator
+        if: ${{ inputs.PLATFORM == 'ios' }}
+        run: |
+          # open -a Simulator.app
+          # sleep 20
+          # xcrun simctl create test com.apple.CoreSimulator.SimDeviceType.iPhone-11 com.apple.CoreSimulator.SimRuntime.iOS-15-2 > deviceid.txt 
+          # DEVICEUUID=`cat deviceid.txt`          
+
+          DEVICEUUID="7CD4002D-C4E0-4334-9C3F-D237D701761F"
+
+          echo $DEVICEUUID          
+          echo "::set-output name=IPHONE_UUID::$(echo $DEVICEUUID)"
+          # xcrun simctl boot $DEVICEUUID &
+        id: simulator
+
       - name: 🏗  Set up Node.js
         uses: actions/setup-node@v1
         with:
@@ -94,7 +109,12 @@ jobs:
 
       - name: 🧪  Run Appium tests on iOS
         if: ${{ inputs.PLATFORM == 'ios' }}
-        run: APP_URL="$GITHUB_WORKSPACE/bin/easdetoxci.app" PLATFORM=ios DEVICE="${{ inputs.DEVICE }}" yarn test:e2e:appium --forceExit
+        run: >
+          APP_URL="$GITHUB_WORKSPACE/bin/easdetoxci.app"
+          PLATFORM=ios
+          DEVICE=test
+          IPHONE_UUID="${{ steps.simulator.outputs.IPHONE_UUID }}"
+          yarn test:e2e:appium --forceExit
 
       - name: Upload Appium logs
         if: always()
