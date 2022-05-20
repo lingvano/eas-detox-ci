@@ -36,5 +36,11 @@ jobs:
       - name: 📦 Install Node.js dependencies
         run: yarn install --frozen-lockfile --prefer-offline
 
+      - uses: actions/cache@v3
+        name: Jest cache
+        with:
+          path: .jest-cache
+          key: ${{ runner.os }}-jest
+
       - name: Run Tests
         run: ${{ inputs.TEST_COMMAND }}
