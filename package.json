@@ -14,7 +14,7 @@
     "expo-status-bar": "~1.4.0",
     "expo-updates": "~0.14.5",
     "jest-expo": "^46.0.0",
-    "react": "18.0.0",
+    "react": "17.0.2",
     "react-dom": "18.0.0",
     "react-native": "0.69.5",
     "react-native-web": "~0.18.7"
@@ -24,7 +24,7 @@
     "@testing-library/jest-native": "^4.0.4",
     "@testing-library/react-native": "^9.1.0",
     "@types/jest": "^27.4.1",
-    "@types/react": "~18.0.0",
+    "@types/react": "17.0.2",
     "@types/react-native": "~0.69.1",
     "appium": "^1.22.3",
     "appium-doctor": "^1.16.0",
