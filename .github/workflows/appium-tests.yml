@@ -1,0 +1,71 @@
+name: E2E tests
+on:
+  workflow_call:
+    secrets:
+      EXPO_TOKEN:
+        required: true
+
+jobs:
+  e2e-tests:
+    name: Appium
+    runs-on: macos-latest
+    steps:
+      - name: 🏗  Checkout repository
+        uses: actions/checkout@v2
+
+      - name: 🏗  Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: 🏗 Setup Yarn
+        run: npm install --g yarn
+
+      - name: 📦  Cache dependencies
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: 📦  Install Node.js dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: 🏗  Setup Expo
+        uses: expo/expo-github-action@v7
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🔗  Get current build url
+        run: |
+          eas build:list --buildProfile=development-sim --status=finished --platform=android --limit=1 --json > buildOutput.txt
+
+          buildUrl=$(cat buildOutput.txt | sed -En 's/.*"buildUrl": "(.*)".*/\1/p')
+          echo "::set-output name=BUILD_URL::$(echo $buildUrl)"
+          echo $buildUrl
+        id: url
+
+      - name: 🏗  Start Appium Server
+        run: yarn appium --log-timestamp --log-no-colors > appium-android.log &
+
+      - name: Wait for Appium Server to Start
+        run: |
+          until $(curl --output /dev/null --silent --head --fail http://127.0.0.1:4723/wd/hub/sessions); do
+            sleep 5
+          done
+
+      - name: 🧪  Spinup Android environment & run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: DEVICE="test" PLATFORM=android APP_URL=${{ steps.url.outputs.BUILD_URL }} yarn test:e2e:appium --forceExit
+
+      - name: Upload Appium logs
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: appium-android.log
+          path: appium-android.log

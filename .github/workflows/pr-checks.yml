@@ -2,7 +2,7 @@ name: PR Checks
 on:
   pull_request:
     branches:
-      - "*"
+      - '*'
 jobs:
   unit-tests:
     name: Unit tests
@@ -12,6 +12,12 @@ jobs:
     needs: unit-tests
     uses: lingvano/eas-detox-ci/.github/workflows/e2e-tests.yml@master
     name: E2E tests
+    secrets:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  appium-android:
+    name: Android Appium tests
+    uses: ./.github/workflows/appium-tests.yml
     secrets:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 

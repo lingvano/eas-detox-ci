@@ -1,12 +1,12 @@
 name: Setup repo & install dependencies
 description: This composite action can be used for setting up the app environment
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: 🏗 Set up Node.js
       uses: actions/setup-node@v1
       with:
-        node-version: 14
+        node-version: 16
 
     - name: 🏗 Setup Yarn
       run: npm install --g yarn
