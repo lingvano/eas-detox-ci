@@ -2,7 +2,7 @@ name: PR Checks
 on:
   pull_request:
     branches:
-      - "*"
+      - '*'
 jobs:
   unit-tests:
     name: Unit tests
@@ -15,23 +15,9 @@ jobs:
     secrets:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-  appium-ios:
-    # needs: unit-tests
-    name: iOS Appium tests
-    uses: ./.github/workflows/appium-tests.yml
-    with:
-      PLATFORM: ios
-      DEVICE: "iPhone 11"
-    secrets:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
   appium-android:
-    # needs: unit-tests
     name: Android Appium tests
     uses: ./.github/workflows/appium-tests.yml
-    with:
-      PLATFORM: android
-      DEVICE: test
     secrets:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
