@@ -1,15 +1,6 @@
 name: E2E tests
 on:
   workflow_call:
-    inputs:
-      PLATFORM:
-        type: string
-        description: Specify the platform ( "ios" | "android" )
-        required: true
-      DEVICE:
-        type: string
-        description: Specify the device to run on (e.g. "iPhone 11")
-        required: true
     secrets:
       EXPO_TOKEN:
         required: true
@@ -21,24 +12,6 @@ jobs:
     steps:
       - name: 🏗  Checkout repository
         uses: actions/checkout@v2
-
-      - name: 📱  Show available iOS Simulators
-        run: xcrun simctl list
-
-      - name: Create and Run iOS Emulator
-        if: ${{ inputs.PLATFORM == 'ios' }}
-        run: |
-          # open -a Simulator.app
-          # sleep 20
-          # xcrun simctl create test com.apple.CoreSimulator.SimDeviceType.iPhone-11 com.apple.CoreSimulator.SimRuntime.iOS-15-2 > deviceid.txt 
-          # DEVICEUUID=`cat deviceid.txt`          
-
-          DEVICEUUID="7CD4002D-C4E0-4334-9C3F-D237D701761F"
-
-          echo $DEVICEUUID          
-          echo "::set-output name=IPHONE_UUID::$(echo $DEVICEUUID)"
-          # xcrun simctl boot $DEVICEUUID &
-        id: simulator
 
       - name: 🏗  Set up Node.js
         uses: actions/setup-node@v1
@@ -68,31 +41,15 @@ jobs:
 
       - name: 🔗  Get current build url
         run: |
-          eas build:list --buildProfile=development-sim --status=finished --platform=${{ inputs.PLATFORM }} --limit=1 --json > buildOutput.txt
+          eas build:list --buildProfile=development-sim --status=finished --platform=android --limit=1 --json > buildOutput.txt
 
           buildUrl=$(cat buildOutput.txt | sed -En 's/.*"buildUrl": "(.*)".*/\1/p')
           echo "::set-output name=BUILD_URL::$(echo $buildUrl)"
           echo $buildUrl
         id: url
 
-      - name: 🏗  Download build
-        if: ${{ inputs.PLATFORM == 'ios' }}
-        uses: suisei-cn/actions-download-file@v1
-        id: downloadedApp
-        with:
-          url: ${{ steps.url.outputs.BUILD_URL }}
-          target: bin/
-
-      - name: 📤  Untar app build
-        if: ${{ inputs.PLATFORM == 'ios' }}
-        run: |
-          cd bin
-          ls -a
-          for f in *.tar.gz; do tar -xvf "$f"; done
-          cd ..
-
       - name: 🏗  Start Appium Server
-        run: yarn appium --log-timestamp --log-no-colors > appium-${{ inputs.PLATFORM }}.log &
+        run: yarn appium --log-timestamp --log-no-colors > appium-android.log &
 
       - name: Wait for Appium Server to Start
         run: |
@@ -101,24 +58,14 @@ jobs:
           done
 
       - name: 🧪  Spinup Android environment & run tests
-        if: ${{ inputs.PLATFORM == 'android' }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           script: DEVICE="test" PLATFORM=android APP_URL=${{ steps.url.outputs.BUILD_URL }} yarn test:e2e:appium --forceExit
 
-      - name: 🧪  Run Appium tests on iOS
-        if: ${{ inputs.PLATFORM == 'ios' }}
-        run: >
-          APP_URL="$GITHUB_WORKSPACE/bin/easdetoxci.app"
-          PLATFORM=ios
-          DEVICE=test
-          IPHONE_UUID="${{ steps.simulator.outputs.IPHONE_UUID }}"
-          yarn test:e2e:appium --forceExit
-
       - name: Upload Appium logs
         if: always()
         uses: actions/upload-artifact@v1
         with:
-          name: appium-${{ inputs.PLATFORM }}.log
-          path: appium-${{ inputs.PLATFORM }}.log
+          name: appium-android.log
+          path: appium-android.log
