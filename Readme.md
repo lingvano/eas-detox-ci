@@ -2,6 +2,8 @@
 
 Unfortunately we never got this project running on a production level. In the meanwhile we have decided to use [Maestro](https://maestro.mobile.dev/) for mobile E2E testing and absolutely love it. You can check out our progress [here](https://github.com/lingvano/react-native-eas-maestro).
 
+-> https://github.com/lingvano/react-native-eas-maestro <-
+
 # Run Detox in CI with EAS build
 
 This project includes example workflows for showing how to run detox tests in a CI environment with Github Actions.
