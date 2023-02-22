@@ -1,6 +1,6 @@
 # ⚠️⚠️ Archive ⚠️⚠️
 
-Unfortunately we never got this project running on a production level. In the meanwhile we have decided to use [Maestro](https://maestro.mobile.dev/) for mobile E2E testing and absolutely love it. You can check out our progress [here](https://github.com/thalmann-christof/eas-meastro-setup).
+Unfortunately we never got this project running on a production level. In the meanwhile we have decided to use [Maestro](https://maestro.mobile.dev/) for mobile E2E testing and absolutely love it. You can check out our progress [here](https://github.com/lingvano/react-native-eas-maestro).
 
 # Run Detox in CI with EAS build
 
